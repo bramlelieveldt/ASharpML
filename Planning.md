@@ -23,3 +23,4 @@ Basischoolleerlingen enthousiast maken over natuurkunde/wiskunde door de natuurk
 3) Wanneer klinkt iets goed? 
     - Slakkenhuis van het oor met frequenties
     - Boventonen en laten zien dat frequenties in elkaar passen
+4) Wat kan jij doen als natuurkundige/wiskundige
