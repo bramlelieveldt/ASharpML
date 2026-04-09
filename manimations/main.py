@@ -12,6 +12,7 @@ class SquareToCircle(Scene):
 
 
         self.play(Create(square))  # animate the creation of the square
-        self.play(Transform(square, circle))  # interpolate the square into the circle
+        self.play(Transform(square, circle))  # interpolate the square into the circl
+        self.wait(1)  # wait for a moment
         self.play(FadeOut(square))  # fade out animation
 
