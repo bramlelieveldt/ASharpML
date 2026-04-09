@@ -24,3 +24,6 @@ Basischoolleerlingen enthousiast maken over natuurkunde/wiskunde door de natuurk
     - Slakkenhuis van het oor met frequenties
     - Boventonen en laten zien dat frequenties in elkaar passen
 4) Wat kan jij doen als natuurkundige/wiskundige
+
+## Animatielijst 
+1) Allemaal puntjes die heen en weer trillen op het scherm, dan een golf erover
