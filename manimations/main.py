@@ -1,5 +1,5 @@
-from manim import *
-import numpy as np
+def main():
+    print("Hello from manimations!")
 
 
 class SquareToCircle(Scene):
