@@ -32,7 +32,7 @@ class SquareToCircle(Scene):
             x_0 = initial_pos[0]  # Initial x position
             y_0 = initial_pos[1]  # Initial y position
             # Sine wave motion along x-axis
-            x = x_0 + A * np.sin(2*np.pi*x_0/wl - 2*np.pi*freq*t) + A * np.sin(2*np.pi*x_0/2*wl - 2*np.pi*2*freq*t)
+            x = x_0 + A * np.sin(2*np.pi*x_0/wl - 2*np.pi*freq*t) 
             y = y_0
             dot.move_to([x, y, 0])
 
