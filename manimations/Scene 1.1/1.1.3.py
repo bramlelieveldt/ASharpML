@@ -89,8 +89,8 @@ class HairResonance(Scene):
                     # F0 chosen so that an on-resonance hair reaches THETA_RES
                     force = 2 * ZETA * THETA_RES * wd ** 2 * ramp * np.sin(ph)
                 acc = force - 2 * ZETA * w_nat * vel - w_nat ** 2 * theta
-                vel += acc * h
-                theta += vel * h
+                vel[:] = vel + acc * h
+                theta[:] = theta + vel * h
             env[:] = np.maximum(np.abs(theta), env * np.exp(-2 * dt))
             for i in range(NH):
                 tip = np.array([hx[i] + length[i] * np.sin(theta[i]),
