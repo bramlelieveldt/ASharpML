@@ -1,2 +1,5 @@
 manimations/__pycache__/
-manimations/media
+manimations/media/
+manimations/media/**
+manimations/Scene 1.1/media/
+manimations/Scene 1.1/__pycache__
