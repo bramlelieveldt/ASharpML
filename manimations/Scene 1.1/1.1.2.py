@@ -11,7 +11,7 @@ from pathlib import Path
 from manim import *
 import numpy as np
 
-N = 900  # Amount of air particles (raise for a denser look, lower if rendering is slow)
+N = 2000  # Amount of air particles (raise for a denser look, lower if rendering is slow)
 
 # --- Ear image ---
 EAR_FILE = "realistic-detailed-human-ear-showing-isolated-on-transparent-background-png.png"

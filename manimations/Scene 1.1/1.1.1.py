@@ -10,7 +10,7 @@ Render:  manim -pql 1.1.1.py BellStrike
 from manim import *
 import numpy as np
 
-N = 900  # Amount of air particles (raise for a denser look, lower if rendering is slow)
+N = 2000  # Amount of air particles (raise for a denser look, lower if rendering is slow)
 
 # --- Wave parameters (spherical wave, emitted from the bell) ---
 C = 2.5            # propagation speed [scene units / s]

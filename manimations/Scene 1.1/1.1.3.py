@@ -10,7 +10,7 @@ Render:  manim -pql 1.1.3.py HairResonance
 from manim import *
 import numpy as np
 
-N = 800  # Amount of air particles (raise for a denser look, lower if rendering is slow)
+N = 2000  # Amount of air particles (raise for a denser look, lower if rendering is slow)
 
 # --- Plane wave (travels left -> right, longitudinal displacement along x, as in main.py) ---
 C = 2.0                # propagation speed [scene units / s]

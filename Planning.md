@@ -1,6 +1,13 @@
 ## Het Doel
 Basischoolleerlingen enthousiast maken over natuurkunde/wiskunde door de natuurkunde van muziek te laten zien 
 
+### Nieuwe Todos
+*Bram*
+- Oor minder realistisch
+- Haartjes duidelijker eentje laten trillen
+- 
+
+
 ### Subdoelen
 1) Leren leuke plaatjes + manimaties maken 
 2) Ambassador project 

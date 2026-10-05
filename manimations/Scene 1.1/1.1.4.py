@@ -19,13 +19,30 @@ THERMAL = 0.02                    # small random jiggle of the air
 # --- Plane wave (travels left -> right, longitudinal displacement along x, as in main.py) ---
 C = 2.4                           # propagation speed [scene units / s]
 FREQS = [0.6, 1.2, 2.4]           # frequencies shown one after another [Hz]
-KA = 0.45                         # k * A (kept the same for every frequency, so the density swing is too)
+KA = 0.5                          # k * A (kept the same for every frequency, so the density swing is too)
 
 # --- Density plot at the bottom ---
-NB = 80                           # histogram bins across the screen
-BASE_Y = -3.0                     # y of rho = rho_0 (undisturbed density)
-PLOT_SCALE = 0.85                 # screen units per unit of rho / rho_0 (clipped to rho_0 +- 1)
-Y_MIN_PARTICLES = -1.7            # air lives above this line, the plot below it
+NB = 120                          # histogram bins across the screen
+BASE_Y = -2.9                     # y of rho = rho_0 (undisturbed density)
+PLOT_SCALE = 1.3                  # screen units per unit of rho / rho_0
+PLOT_CLIP = 0.8                   # plot shows rho_0 +- PLOT_CLIP (keeps noisy early curves on screen)
+Y_MIN_PARTICLES = -1.6            # air lives above this line, the plot below it
+
+# True: particles are placed with a low-discrepancy (Halton) sequence. They still look random, but the
+# histogram noise drops like 1/N instead of 1/sqrt(N), so the sine is clearly visible with 4000 particles.
+# False: purely random positions (much noisier density plot).
+QUASI_RANDOM = True
+
+
+def halton(n, b):
+    """First n terms of the van der Corput / Halton sequence in base b (every prefix is evenly spread)."""
+    i = np.arange(1, n + 1)
+    out, f = np.zeros(n), 1.0 / b
+    while i.max() > 0:
+        out += f * (i % b)
+        i //= b
+        f /= b
+    return out
 
 
 class DensitySine(Scene):
@@ -46,10 +63,12 @@ class DensitySine(Scene):
         drive = {"f": FREQS[0], "t0": None}
 
         # ---------------- Particle pool (random order -> any prefix is uniform) ----------------
-        base = np.column_stack([
-            rng.uniform(XL, XR, NMAX),
-            rng.uniform(Y_MIN_PARTICLES, height / 2 + 0.2, NMAX),
-        ])
+        y_lo, y_hi = Y_MIN_PARTICLES, height / 2 + 0.2
+        if QUASI_RANDOM:
+            ux, uy = halton(NMAX, 2), halton(NMAX, 3)
+        else:
+            ux, uy = rng.uniform(0, 1, NMAX), rng.uniform(0, 1, NMAX)
+        base = np.column_stack([XL + WD * ux, y_lo + (y_hi - y_lo) * uy])    # "rest" positions x0, y
         phase = rng.uniform(0, 2 * PI, (NMAX, 2))
 
         template = Dot(ORIGIN, radius=DOT_RADIUS).points.copy()    # set points directly: much faster than move_to
@@ -76,6 +95,18 @@ class DensitySine(Scene):
             ramp = ramp * ramp * (3 - 2 * ramp)
             return gain.get_value() * A * ramp * np.sin(k * xr - wd * tau)
 
+        def particle_x(x0, t):
+            """Position x of the particle whose rest position is x0, with x = x0 + u(x, t).
+
+            u is the sine wave as a function of where the particle IS, so the density is
+            rho = dx0/dx = 1 - du/dx = 1 - kA cos(kx - wt): an exact sine (needs kA < 1).
+            (Using u(x0) instead would give 1/(1 + du/dx0), a skewed, non-sinusoidal density.)
+            """
+            x = x0.copy()
+            for _ in range(20):                      # fixed-point iteration, converges for kA < 1
+                x = x0 + wave_u(x, t)
+            return x
+
         # ---------------- Density plot objects ----------------
         axis_x0, axis_x1 = -width / 2 + 0.5, width / 2 - 0.5
         baseline = Line([axis_x0, BASE_Y, 0], [axis_x1, BASE_Y, 0], stroke_width=2, color=GREY)
@@ -89,16 +120,16 @@ class DensitySine(Scene):
         edges = np.linspace(-width / 2, width / 2, NB + 1)
         centers = (edges[:-1] + edges[1:]) / 2
         bin_w = edges[1] - edges[0]
-        x0_grid = np.linspace(XL, XR, 600)
+        x_grid = np.linspace(-width / 2, width / 2, 600)       # screen positions for the sine curve
 
         def rho_to_y(rho):
-            return BASE_Y + PLOT_SCALE * np.clip(rho - 1, -1, 1)
+            return BASE_Y + PLOT_SCALE * np.clip(rho - 1, -PLOT_CLIP, PLOT_CLIP)
 
         # One driver updates everything (a plain updater on the dots would be paused while they fade in)
         def update_all(_):
             t = clock.get_value()
             n = n_act[0]
-            px = base[:n, 0] + wave_u(base[:n, 0], t) + THERMAL * np.sin(1.3 * t + phase[:n, 0])
+            px = particle_x(base[:n, 0], t) + THERMAL * np.sin(1.3 * t + phase[:n, 0])
             py = base[:n, 1] + THERMAL * np.cos(1.1 * t + phase[:n, 1])
             for i in range(n):
                 dots[i].points = template + np.array([px[i], py[i], 0.0])
@@ -109,13 +140,10 @@ class DensitySine(Scene):
             rho_h = counts / (m * bin_w / WD)
             hist_curve.set_points_as_corners(np.column_stack([centers, rho_to_y(rho_h), np.zeros(NB)]))
 
-            # Exact density of the wave: rho = dx0 / dx
-            xs = x0_grid + wave_u(x0_grid, t)
-            rho_t = 1 / np.gradient(xs, x0_grid)
-            vis = (xs > -width / 2) & (xs < width / 2)
-            if vis.sum() > 2:
-                theory_curve.set_points_as_corners(
-                    np.column_stack([xs[vis], rho_to_y(rho_t[vis]), np.zeros(vis.sum())]))
+            # Density of the wave: rho = 1 - du/dx = 1 - kA cos(kx - wt) behind the front
+            rho_t = 1 - np.gradient(wave_u(x_grid, t), x_grid)
+            theory_curve.set_points_as_corners(
+                np.column_stack([x_grid, rho_to_y(rho_t), np.zeros(len(x_grid))]))
 
         driver = Mobject()
         driver.add_updater(update_all)
