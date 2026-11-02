@@ -64,3 +64,15 @@ Basischoolleerlingen enthousiast maken over natuurkunde/wiskunde door de natuurk
 
 ## Planning
 **3 Oktober** Deadlines draft HTML's en animaties
+- Presentatie zelf in elkaar zetten 
+- Ieder zijn eigen stuk van de presentatie
+- April weer afspreken
+- Thema jatten voor presenatie Bram 
+
+
+## Scholen
+2 scholen, 2 middagen waarbij mogelijk meerdere klassen. 
+
+- Bram mailt Nehalennia Middelburg
+- Alex maakt mail vandaag
+  - Stuurt mail naar scholen in Den Haag    
